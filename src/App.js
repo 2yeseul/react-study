@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useMemo, useCallback } from 'react'
 import Counter from './Counter';
 import Hello from './Hello'
 import InputSample from './InputSample'
@@ -12,33 +12,39 @@ function App() {
   })
 
   const { username, email } = inputs
-  const onChange = e => {
+  const onChange = useCallback(e => {
     const { name, value } = e.target
     setInputs({
       ...inputs,
       [name]: value
     })
-  }
+  },
+  [inputs]
+  )
+
   const [users, setUsers] = useState([
     {
       id: 1,
       username: 'seul',
-      email: 'public.seul@gmail.com'
+      email: 'public.seul@gmail.com',
+      active: true
     },
     {
       id: 2,
       username: 'tester',
-      email: 'tester@example.com'
+      email: 'tester@example.com',
+      active: false
     },
     {
       id: 3,
       username: 'odile',
-      email: 'odile@example.com'
+      email: 'odile@example.com',
+      active: false
     }
   ])
 
   const nextId = useRef(4)
-  const onCreate = () => {
+  const onCreate = useCallback(() => {
     const user = {
       id: nextId.current,
       username,
@@ -51,8 +57,29 @@ function App() {
       email: ''
     })
     nextId.current += 1
+  },
+  [users, username, email]
+  )
+
+  const onRemove = useCallback((id) => {
+    setUsers(users.filter(user => user.id !== id))
+  }, [users])
+  
+
+  const onToggle = useCallback(id => {
+    setUsers(
+      users.map(user => user.id === id ? { ...user, active: !user.active } : user )
+    )
+  }, [users]
+  )
+
+  function countActiveUsers(users) {
+    console.log(`Counting active users...`)
+    return users.filter(user => user.active).length
   }
 
+  const count = useMemo(() => countActiveUsers(users), [users])
+ 
   return (
     <>
     <Hello />
@@ -64,7 +91,8 @@ function App() {
       onChange={onChange}
       onCreate={onCreate}
     />
-    <UserList users={users} />
+    <UserList users={users} onRemove={onRemove} onToggle={onToggle} />
+    <div>Count of Active Users: {count}</div>
     </>
   )
 }

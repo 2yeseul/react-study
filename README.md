@@ -139,3 +139,9 @@ JSX에서 태그에 style과 CSS class를 설정하는 방법은 HTML에서 설�
 ``` javascript
 { /* 주석! */ }
 ``` 
+
+# Hook
+## useMemo, useCallback
+`useMemo` 는 특정 결과 값을 재사용, `useCallback`은 특정 함수를 새로 만들지 않고 재사용 
+### useCallback
+함수 내에서 사용하는 상태 or props가 있는 경우 꼭 deps 배열 내에 포함시켜야 한다. 
